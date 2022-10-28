@@ -1,11 +1,15 @@
 import pygame, sys
 from settings import * 
 
+from level import Level
+
 # Pygame setup
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Bill\'s Revenge')
 clock = pygame.time.Clock()
+
+level = Level()
 
 while True:
 	# event loop
@@ -13,6 +17,8 @@ while True:
 		if event.type == pygame.QUIT:
 			pygame.quit()
 			sys.exit()
+	
+	level.run()
 
 	# drawing logic
 	pygame.display.update()
