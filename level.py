@@ -1,5 +1,5 @@
 import pygame
-from player import BillGates
+from player import BillGates, PlayableSurface
 from settings import *
 
 class Level():
@@ -19,8 +19,9 @@ class Level():
 
         # charging background
         self.Background([self.visible_sprites])
-        bg = BillGates([self.visible_sprites])
+        bg = BillGates(5, [self.visible_sprites, self.active_sprites])
         bg.rect.bottomleft = self.display_surface.get_rect().bottomleft
+        bg.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
 
     def run(self):
         self.active_sprites.update()
