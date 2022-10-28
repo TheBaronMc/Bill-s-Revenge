@@ -1,5 +1,5 @@
 import pygame
-from typing import Tuple
+from typing import Dict, Tuple
 
 from settings import *
 
@@ -23,7 +23,15 @@ class PlayableSurface(pygame.sprite.Sprite):
 
 class BillGates(Player):
     def __init__(self, speed: int, *groups: pygame.sprite.AbstractGroup) -> None:
-        super().__init__(BILL_GATES, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
+        super().__init__(BILL_GATES_FRONT, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
+
+        self.movements: Dict[str,pygame.Surface] = {
+            'STATIC': self.image,
+            'DOWN': self.image,
+            'UP': self.__load_image(BILL_GATES_BACK),
+            'LEFT': self.__load_image(BILL_GATES_LEFT),
+            'RIGHT': self.__load_image(BILL_GATES_RIGHT)
+        }
 
         self.direction = pygame.math.Vector2()
         self.speed = speed
@@ -42,15 +50,20 @@ class BillGates(Player):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_z]:
             self.direction.y = -1
+            self.image = self.movements['UP']
         elif keys[pygame.K_s]:
             self.direction.y = 1
+            self.image = self.movements['DOWN']
         else:
             self.direction.y = 0
+            self.image = self.movements['STATIC']
 
         if keys[pygame.K_q]:
             self.direction.x = -1
+            self.image = self.movements['LEFT']
         elif keys[pygame.K_d]:
             self.direction.x = 1
+            self.image = self.movements['RIGHT']
         else:
             self.direction.x = 0
 
@@ -69,3 +82,7 @@ class BillGates(Player):
 
             if self.rect.right > self.playable_surface.rect.right:
                 self.rect.right = self.playable_surface.rect.right
+
+    def __load_image(self, image: str) -> pygame.surface.Surface:
+        surface = pygame.image.load(image).convert_alpha()
+        return pygame.transform.scale(surface, (PLAYER_WIDTH, PLAYER_HEIGHT))
