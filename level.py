@@ -1,4 +1,5 @@
 import pygame
+from player import BillGates
 from settings import *
 
 class Level():
@@ -17,7 +18,9 @@ class Level():
     def setup_level(self):
 
         # charging background
-        self.Background(self.visible_sprites)
+        self.Background([self.visible_sprites])
+        bg = BillGates([self.visible_sprites])
+        bg.rect.bottomleft = self.display_surface.get_rect().bottomleft
 
     def run(self):
         self.active_sprites.update()
