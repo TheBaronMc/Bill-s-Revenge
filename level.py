@@ -13,6 +13,9 @@ class Level():
         self.active_sprites = pygame.sprite.Group()
         self.collision_sprites = pygame.sprite.Group()
 
+        self.in_game_song = pygame.mixer.Sound(IN_GAME_SONG)
+        self.in_game_song.set_volume(0.2)
+
         self.setup_level()
 
     def setup_level(self):
@@ -22,6 +25,9 @@ class Level():
         bg = BillGates(5, [self.visible_sprites, self.active_sprites])
         bg.rect.bottomleft = self.display_surface.get_rect().bottomleft
         bg.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
+
+        # start music
+        pygame.mixer.Sound.play(self.in_game_song)
 
     def run(self):
         self.active_sprites.update()
