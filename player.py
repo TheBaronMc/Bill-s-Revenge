@@ -1,5 +1,6 @@
 import pygame
-from typing import Dict, Tuple
+from math import sqrt
+from typing import Dict, Iterable, Tuple
 
 from settings import *
 
@@ -11,6 +12,29 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(surface, size)
         self.rect = self.image.get_rect()
 
+        self.health = 100
+        self.power = 50
+        self.ennemies = []
+
+    def add_ennemy(self, ennemy):
+        self.ennemies.append(ennemy)
+
+    def attack(self):
+        hits = pygame.sprite.spritecollide(self, self.ennemies, False)
+        for ennemy in hits:
+            distance = sqrt((ennemy.rect.centerx - self.rect.centerx)**2 + (ennemy.rect.bottom - self.rect.bottom)**2)
+            if distance < 30:
+                ennemy.get_hit()
+            
+
+    def get_hit(self):
+        self.health -= self.power
+        if self.health <= 0:
+            self.die()
+
+    def die(self):
+        self.remove(self.groups())
+
 
 class PlayableSurface(pygame.sprite.Sprite):
     def __init__(self, size: Tuple[int, int], *groups: pygame.sprite.AbstractGroup) -> None:
@@ -20,11 +44,21 @@ class PlayableSurface(pygame.sprite.Sprite):
         #self.image.fill((0,0,255))
         self.rect = self.image.get_rect(topleft=(0, SCREEN_HEIGHT - size[1]))
 
+
 class SteveJobs(Player):
     def __init__(self, starting_position: Tuple[int,int], *groups: pygame.sprite.AbstractGroup) -> None:
         super().__init__(STEVE_JOBS, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
 
         self.rect.bottomleft = starting_position
+        self.cry = pygame.mixer.Sound(WILHELM)
+        self.cry.set_volume(0.1)
+        self.sound_played = False
+
+    def get_hit(self):
+        super().get_hit()
+        if not self.sound_played:
+            pygame.mixer.Sound.play(self.cry)
+            self.sound_played = True
 
 
 class BillGates(Player):
@@ -36,7 +70,12 @@ class BillGates(Player):
             'DOWN': self.image,
             'UP': self.__load_image(BILL_GATES_BACK),
             'LEFT': self.__load_image(BILL_GATES_LEFT),
-            'RIGHT': self.__load_image(BILL_GATES_RIGHT)
+            'RIGHT': self.__load_image(BILL_GATES_RIGHT),
+            'STATIC_ATTACK': self.__load_image(BILL_GATES_FRONT_ATTACK),
+            'DOWN_ATTACK': self.__load_image(BILL_GATES_FRONT_ATTACK),
+            'UP_ATTACK':  self.__load_image(BILL_GATES_BACK_ATTACK),
+            'LEFT_ATTACK':  self.__load_image(BILL_GATES_LEFT_ATTACK),
+            'RIGHT_ATTACK':  self.__load_image(BILL_GATES_RIGHT_ATTACK)
         }
 
         self.direction = pygame.math.Vector2()
@@ -56,22 +95,25 @@ class BillGates(Player):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_z]:
             self.direction.y = -1
-            self.image = self.movements['UP']
+            self.image = self.movements['UP' + ('_ATTACK' if keys[pygame.K_m] else '')]
         elif keys[pygame.K_s]:
             self.direction.y = 1
-            self.image = self.movements['DOWN']
+            self.image = self.movements['DOWN' + ('_ATTACK' if keys[pygame.K_m] else '')]
         else:
             self.direction.y = 0
-            self.image = self.movements['STATIC']
+            self.image = self.movements['STATIC' + ('_ATTACK' if keys[pygame.K_m] else '')]
 
         if keys[pygame.K_q]:
             self.direction.x = -1
-            self.image = self.movements['LEFT']
+            self.image = self.movements['LEFT' + ('_ATTACK' if keys[pygame.K_m] else '')]
         elif keys[pygame.K_d]:
             self.direction.x = 1
-            self.image = self.movements['RIGHT']
+            self.image = self.movements['RIGHT' + ('_ATTACK' if keys[pygame.K_m] else '')]
         else:
             self.direction.x = 0
+
+        if keys[pygame.K_m]:
+            self.attack()
 
     def __playable_surface_collisions(self):
         if self.playable_surface:

@@ -13,12 +13,20 @@ BILL_GATES_FRONT = SPRITES_PATH + 'bill_front.png'
 BILL_GATES_BACK = SPRITES_PATH + 'bill_back.png'
 BILL_GATES_LEFT = SPRITES_PATH + 'bill_left.png'
 BILL_GATES_RIGHT = SPRITES_PATH + 'bill_right.png'
+BILL_GATES_FRONT_ATTACK = SPRITES_PATH + 'bill_front_attack.png'
+BILL_GATES_BACK_ATTACK = SPRITES_PATH + 'bill_back_attack.png'
+BILL_GATES_LEFT_ATTACK = SPRITES_PATH + 'bill_left_attack.png'
+BILL_GATES_RIGHT_ATTACK = SPRITES_PATH + 'bill_right_attack.png'
 
 STEVE_JOBS = SPRITES_PATH + 'steve_jobs.png'
 
 MUSICS = ASSETS_PATH + 'musics/'
 
 IN_GAME_SONG = MUSICS + 'in_game.mp3'
+
+SOUNDS = ASSETS_PATH + 'sounds/'
+
+WILHELM = SOUNDS + 'wilhelm.mp3'
 
 PLAYER_HEIGHT = 180
 PLAYER_WIDTH = 60

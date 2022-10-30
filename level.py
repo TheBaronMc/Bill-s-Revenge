@@ -2,7 +2,7 @@ import pygame
 
 from typing import Union, Sequence
 
-from player import BillGates, PlayableSurface
+from player import BillGates, PlayableSurface, SteveJobs
 from settings import *
 
 class Level():
@@ -28,6 +28,7 @@ class Level():
         self.player = BillGates(5, [self.visible_sprites, self.active_sprites])
         self.player.rect.bottomleft = self.display_surface.get_rect().bottomleft
         self.player.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
+        self.player.add_ennemy(SteveJobs((SCREEN_WIDTH//2, SCREEN_HEIGHT), [self.visible_sprites]))
 
         # start music
         pygame.mixer.Sound.play(self.in_game_song)
