@@ -14,6 +14,8 @@ BILL_GATES_BACK = SPRITES_PATH + 'bill_back.png'
 BILL_GATES_LEFT = SPRITES_PATH + 'bill_left.png'
 BILL_GATES_RIGHT = SPRITES_PATH + 'bill_right.png'
 
+STEVE_JOBS = SPRITES_PATH + 'steve_jobs.png'
+
 MUSICS = ASSETS_PATH + 'musics/'
 
 IN_GAME_SONG = MUSICS + 'in_game.mp3'

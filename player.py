@@ -20,6 +20,12 @@ class PlayableSurface(pygame.sprite.Sprite):
         #self.image.fill((0,0,255))
         self.rect = self.image.get_rect(topleft=(0, SCREEN_HEIGHT - size[1]))
 
+class SteveJobs(Player):
+    def __init__(self, starting_position: Tuple[int,int], *groups: pygame.sprite.AbstractGroup) -> None:
+        super().__init__(STEVE_JOBS, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
+
+        self.rect.bottomleft = starting_position
+
 
 class BillGates(Player):
     def __init__(self, speed: int, *groups: pygame.sprite.AbstractGroup) -> None:
