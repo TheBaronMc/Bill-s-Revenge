@@ -30,9 +30,16 @@ def run_game():
 		pygame.display.update()
 		clock.tick(60)
 
+mytheme = pygame_menu.themes.THEME_DEFAULT.copy()
+myimage = pygame_menu.baseimage.BaseImage(
+    image_path=MENU,
+    drawing_mode=pygame_menu.baseimage.IMAGE_MODE_REPEAT_XY,
+)
+myimage.resize(SCREEN_WIDTH,SCREEN_HEIGHT)
+mytheme.background_color = myimage
 
 menu = pygame_menu.Menu('Bill\'s Revenge', SCREEN_WIDTH, SCREEN_HEIGHT,
-                       theme=pygame_menu.themes.THEME_BLUE)
+                       theme=mytheme)
 
 menu.add.button('Play', run_game)
 menu.add.button('Quit', pygame_menu.events.EXIT)
