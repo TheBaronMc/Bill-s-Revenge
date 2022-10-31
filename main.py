@@ -17,7 +17,7 @@ def run_game():
 	menu_song.fadeout(100)
 	level = Level()
 
-	while True:
+	while not level.is_finished():
 		# event loop
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -29,6 +29,8 @@ def run_game():
 		# drawing logic
 		pygame.display.update()
 		clock.tick(60)
+
+	level.quit()
 
 mytheme = pygame_menu.themes.THEME_DEFAULT.copy()
 myimage = pygame_menu.baseimage.BaseImage(

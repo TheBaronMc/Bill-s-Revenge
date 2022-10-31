@@ -1,3 +1,4 @@
+from xmlrpc.client import Boolean
 import pygame
 from math import sqrt
 from typing import Dict, Iterable, Tuple
@@ -40,6 +41,9 @@ class Player(pygame.sprite.Sprite):
 
     def die(self):
         self.remove(self.groups())
+
+    def is_dead(self) -> Boolean:
+        return self.health <= 0
 
 
 class PlayableSurface(pygame.sprite.Sprite):

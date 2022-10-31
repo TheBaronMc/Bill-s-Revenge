@@ -1,7 +1,8 @@
+from xmlrpc.client import Boolean
 import pygame
 import random
 
-from typing import List, Union, Sequence, Any
+from typing import Dict, List, Union, Sequence, Any
 
 from player import BillGates, PlayableSurface, Player, SteveJobs
 from settings import *
@@ -16,6 +17,7 @@ class Level():
         self.visible_sprites = CameraGroup()
         self.active_sprites = pygame.sprite.Group()
         self.collision_sprites = pygame.sprite.Group()
+        self.ennemy_sprites = pygame.sprite.Group()
 
         self.in_game_song = pygame.mixer.Sound(IN_GAME_SONG)
         self.in_game_song.set_volume(0.2)
@@ -32,7 +34,7 @@ class Level():
         for _ in range(NB_ENNEMY):
             x = random.randint(200, PLAYABLE_SURFACE_WIDTH)
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
-            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.visible_sprites]))
+            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.visible_sprites, self.ennemy_sprites]))
 
         self.score_board = ScoreBoard(self.player, [self.active_sprites, self.visible_sprites])
 
@@ -42,6 +44,15 @@ class Level():
     def run(self):
         self.active_sprites.update()
         self.visible_sprites.custom_draw(self.player, self.background, self.score_board)
+
+    def is_finished(self) -> Boolean:
+        return len(self.ennemy_sprites.sprites()) == 0
+
+    def scores(self) -> Dict:
+        return { 'score': self.player.get_score() }
+    
+    def quit(self):
+        pygame.mixer.Sound.stop(self.in_game_song)
 
 
 class Background(pygame.sprite.Sprite):
