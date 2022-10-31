@@ -43,7 +43,12 @@ mytheme.background_color = myimage
 menu = pygame_menu.Menu('Bill\'s Revenge', SCREEN_WIDTH, SCREEN_HEIGHT,
                        theme=mytheme)
 
+score_menu = pygame_menu.Menu('Scores', SCREEN_WIDTH, SCREEN_HEIGHT,
+                       theme=mytheme)
+score_menu.add.button('Go back to menu', pygame_menu.events.BACK)
+
 menu.add.button('Play', run_game)
+menu.add.button('Other Menu', score_menu)
 menu.add.button('Quit', pygame_menu.events.EXIT)
 
 menu.mainloop(screen)
