@@ -1,9 +1,9 @@
 import pygame
 import random
 
-from typing import Union, Sequence
+from typing import Union, Sequence, Any
 
-from player import BillGates, PlayableSurface, SteveJobs
+from player import BillGates, PlayableSurface, Player, SteveJobs
 from settings import *
 
 class Level():
@@ -34,12 +34,14 @@ class Level():
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
             self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.visible_sprites]))
 
+        self.score_board = ScoreBoard(self.player, [self.active_sprites, self.visible_sprites])
+
         # start music
         pygame.mixer.Sound.play(self.in_game_song)
 
     def run(self):
         self.active_sprites.update()
-        self.visible_sprites.custom_draw(self.player, self.background)
+        self.visible_sprites.custom_draw(self.player, self.background, self.score_board)
 
 
 class Background(pygame.sprite.Sprite):
@@ -61,7 +63,7 @@ class CameraGroup(pygame.sprite.Group):
         # camera
         self.camera_rect = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    def custom_draw(self, player: BillGates, background: Background = None):
+    def custom_draw(self, player: BillGates, background: Background = None, score_board = None):
 
         # Camera position
         half_w = SCREEN_WIDTH // 2
@@ -74,8 +76,30 @@ class CameraGroup(pygame.sprite.Group):
 
         # camera offset 
         self.offset = pygame.math.Vector2(self.camera_rect.left, 0)
+
+        # update score board position
+        if score_board:
+            score_board.rect.topleft = self.camera_rect.topleft
         
         # Display all sprites
         for sprite in self.sprites():
             offset_pos = sprite.rect.topleft - self.offset
             self.display_surface.blit(sprite.image, offset_pos)        
+
+class ScoreBoard(pygame.sprite.Sprite):
+    def __init__(self, player: Player, *groups: pygame.sprite.AbstractGroup) -> None:
+        super().__init__(*groups)
+
+        self.font = pygame.font.SysFont(None, 72)
+        self.image = self.font.render('SCORE: 000000', True, (255,255,0))
+        self.rect = self.image.get_rect()
+        self.player = player
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        super().update(*args, **kwargs)
+        self.image = self.font.render('SCORE: {:0>6}'.format(self.player.get_score()), True, (255,255,0))
+
+        self.screen = pygame.display.get_surface()
+        self.rect.left = self.screen.get_rect().left
+
+        

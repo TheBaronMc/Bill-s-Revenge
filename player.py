@@ -16,6 +16,8 @@ class Player(pygame.sprite.Sprite):
         self.power = 50
         self.ennemies = []
 
+        self.score = 0
+
     def add_ennemy(self, ennemy):
         self.ennemies.append(ennemy)
 
@@ -25,12 +27,16 @@ class Player(pygame.sprite.Sprite):
             distance = sqrt((ennemy.rect.centerx - self.rect.centerx)**2 + (ennemy.rect.bottom - self.rect.bottom)**2)
             if distance < 30:
                 ennemy.get_hit()
+                self.score += 50
             
 
     def get_hit(self):
         self.health -= self.power
         if self.health <= 0:
             self.die()
+
+    def get_score(self) -> int:
+        return self.score
 
     def die(self):
         self.remove(self.groups())
