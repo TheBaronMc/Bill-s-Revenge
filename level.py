@@ -1,7 +1,7 @@
 import pygame
 import random
 
-from typing import Union, Sequence, Any
+from typing import List, Union, Sequence, Any
 
 from player import BillGates, PlayableSurface, Player, SteveJobs
 from settings import *
@@ -82,9 +82,20 @@ class CameraGroup(pygame.sprite.Group):
             score_board.rect.topleft = self.camera_rect.topleft
         
         # Display all sprites
+        player_sprites: List[Player] = []
         for sprite in self.sprites():
             offset_pos = sprite.rect.topleft - self.offset
-            self.display_surface.blit(sprite.image, offset_pos)        
+
+            if not isinstance(sprite, Player):
+                self.display_surface.blit(sprite.image, offset_pos)
+            else:
+                player_sprites.append(sprite)
+
+        player_sprites.sort(key=lambda player: player.rect.bottom)
+        for player_sprite in player_sprites:
+            offset_pos = player_sprite.rect.topleft - self.offset
+            self.display_surface.blit(player_sprite.image, offset_pos)
+
 
 class ScoreBoard(pygame.sprite.Sprite):
     def __init__(self, player: Player, *groups: pygame.sprite.AbstractGroup) -> None:
