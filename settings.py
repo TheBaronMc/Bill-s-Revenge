@@ -23,6 +23,7 @@ STEVE_JOBS = SPRITES_PATH + 'steve_jobs.png'
 MUSICS = ASSETS_PATH + 'musics/'
 
 IN_GAME_SONG = MUSICS + 'in_game.mp3'
+IN_MENU_SONG = MUSICS + 'in_menu.mp3'
 
 SOUNDS = ASSETS_PATH + 'sounds/'
 

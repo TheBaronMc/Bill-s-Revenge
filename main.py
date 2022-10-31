@@ -10,9 +10,13 @@ screen = pygame.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 pygame.display.set_caption('Bill\'s Revenge')
 clock = pygame.time.Clock()
 
+menu_song = pygame.mixer.Sound(IN_MENU_SONG)
+pygame.mixer.Sound.play(menu_song)
+
 def run_game():
+	menu_song.fadeout(100)
 	level = Level()
-	
+
 	while True:
 		# event loop
 		for event in pygame.event.get():
