@@ -1,8 +1,11 @@
 import pygame, sys
 import pygame_menu
+import datetime
+import time
 
 from settings import * 
 from level import Level
+from db import Connector
 
 # Pygame setup
 pygame.init()
@@ -13,9 +16,12 @@ clock = pygame.time.Clock()
 menu_song = pygame.mixer.Sound(IN_MENU_SONG)
 pygame.mixer.Sound.play(menu_song)
 
+con = Connector()
+
 def run_game():
 	menu_song.fadeout(100)
 	level = Level()
+	start_time = time.time()
 
 	while not level.is_finished():
 		# event loop
@@ -32,6 +38,13 @@ def run_game():
 
 	level.quit()
 
+	res = level.scores()
+
+	date = datetime.datetime.now()
+	date_str = f'{date.day}/{date.month}/{date.year}'
+
+	con.add(date_str, str(res['score']), str(round(time.time() - start_time,2)))
+
 mytheme = pygame_menu.themes.THEME_DEFAULT.copy()
 myimage = pygame_menu.baseimage.BaseImage(
     image_path=MENU,
@@ -45,10 +58,15 @@ menu = pygame_menu.Menu('Bill\'s Revenge', SCREEN_WIDTH, SCREEN_HEIGHT,
 
 score_menu = pygame_menu.Menu('Scores', SCREEN_WIDTH, SCREEN_HEIGHT,
                        theme=mytheme)
+table = score_menu.add.table(table_id='Score table')
+table.add_row(['DATE', 'SCORE', 'TIME'],
+              cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD)
+for score in con.get_stats():
+	table.add_row(score, cell_align=pygame_menu.locals.ALIGN_CENTER)
 score_menu.add.button('Go back to menu', pygame_menu.events.BACK)
 
 menu.add.button('Play', run_game)
-menu.add.button('Other Menu', score_menu)
+menu.add.button('Scores', score_menu)
 menu.add.button('Quit', pygame_menu.events.EXIT)
 
 menu.mainloop(screen)
