@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
         hits = pygame.sprite.spritecollide(self, self.ennemies, False)
         for ennemy in hits:
             distance = sqrt((ennemy.rect.centerx - self.rect.centerx)**2 + (ennemy.rect.bottom - self.rect.bottom)**2)
-            if distance < 30:
+            if distance <= (PLAYER_WIDTH / 3) * 2:
                 ennemy.get_hit()
                 self.score += 50
             
