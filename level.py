@@ -30,9 +30,9 @@ class Level():
         self.player.rect.bottomleft = self.display_surface.get_rect().bottomleft
         self.player.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
         for _ in range(NB_ENNEMY):
-            offset_x = random.randint(200, PLAYABLE_SURFACE_WIDTH)
+            x = random.randint(200, PLAYABLE_SURFACE_WIDTH)
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
-            self.player.add_ennemy(SteveJobs((offset_x, SCREEN_HEIGHT - offset_y), [self.visible_sprites]))
+            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.visible_sprites]))
 
         # start music
         pygame.mixer.Sound.play(self.in_game_song)
