@@ -93,6 +93,8 @@ class BillGates(Player):
 
         self.playable_surface = None
 
+        self.attack_charged = True
+
     def set_playable_surface(self, surface: PlayableSurface):
         self.playable_surface = surface
 
