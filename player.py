@@ -122,8 +122,11 @@ class BillGates(Player):
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_m]:
+        if keys[pygame.K_m] and self.attack_charged:
             self.attack()
+            self.attack_charged = False
+        elif not keys[pygame.K_m]:
+            self.attack_charged = True
 
     def __playable_surface_collisions(self):
         if self.playable_surface:
