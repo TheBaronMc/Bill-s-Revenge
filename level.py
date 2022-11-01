@@ -34,7 +34,7 @@ class Level():
         for _ in range(NB_ENNEMY):
             x = random.randint(200, PLAYABLE_SURFACE_WIDTH)
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
-            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.visible_sprites, self.ennemy_sprites]))
+            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.active_sprites, self.visible_sprites, self.ennemy_sprites]))
 
         self.score_board = ScoreBoard(self.player, [self.active_sprites, self.visible_sprites])
 

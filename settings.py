@@ -21,6 +21,7 @@ BILL_GATES_LEFT_ATTACK = SPRITES_PATH + 'bill_left_attack.png'
 BILL_GATES_RIGHT_ATTACK = SPRITES_PATH + 'bill_right_attack.png'
 
 STEVE_JOBS = SPRITES_PATH + 'steve_jobs.png'
+STEVE_JOBS_ATTACKED = SPRITES_PATH + 'steve_jobs_attacked.png'
 
 MUSICS = ASSETS_PATH + 'musics/'
 

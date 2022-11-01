@@ -1,7 +1,8 @@
-from xmlrpc.client import Boolean
 import pygame
+import time
+
 from math import sqrt
-from typing import Dict, Iterable, Tuple
+from typing import Dict, Iterable, Tuple, Any
 
 from settings import *
 
@@ -42,7 +43,7 @@ class Player(pygame.sprite.Sprite):
     def die(self):
         self.remove(self.groups())
 
-    def is_dead(self) -> Boolean:
+    def is_dead(self) -> bool:
         return self.health <= 0
 
 
@@ -59,16 +60,37 @@ class SteveJobs(Player):
     def __init__(self, starting_position: Tuple[int,int], *groups: pygame.sprite.AbstractGroup) -> None:
         super().__init__(STEVE_JOBS, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
 
+        self.images: Dict[str,pygame.Surface] = {
+            'NORMAL': self.image,
+            'ATTACKED': self.__load_image(STEVE_JOBS_ATTACKED)
+        }
+
         self.rect.bottomleft = starting_position
         self.cry = pygame.mixer.Sound(WILHELM)
         self.cry.set_volume(0.1)
         self.sound_played = False
+        
+        self.attacked = False
+        self.attack_animation_duration = 0
 
     def get_hit(self):
         super().get_hit()
         if not self.sound_played:
             pygame.mixer.Sound.play(self.cry)
             self.sound_played = True
+            self.attacked = True
+            self.attack_animation_duration = time.time()
+            self.image = self.images['ATTACKED']
+            
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        super().update(*args, **kwargs)
+        if self.attacked and (time.time() - self.attack_animation_duration > 0.5):
+            self.image = self.images['NORMAL']
+            self.attacked = False
+
+    def __load_image(self, image: str) -> pygame.surface.Surface:
+        surface = pygame.image.load(image).convert_alpha()
+        return pygame.transform.scale(surface, (PLAYER_WIDTH, PLAYER_HEIGHT))
 
 
 class BillGates(Player):

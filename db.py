@@ -14,7 +14,6 @@ class Connector:
 
     def add(self, date: str, score: int, time: float):
         query = f"INSERT INTO stats VALUES ( \"{date}\", {score}, {time} )"
-        print(query)
         self.con.execute(query)
         self.con.commit()
 
