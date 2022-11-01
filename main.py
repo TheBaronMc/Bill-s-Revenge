@@ -45,6 +45,7 @@ def run_game(table: pygame_menu.widgets.Table):
 
 	con.add(date_str, str(res['score']), str(round(time.time() - start_time,2)))
 	table.add_row([ date_str, str(res['score']), str(round(time.time() - start_time,2)) ])
+	pygame.mixer.Sound.play(menu_song)
 
 mytheme = pygame_menu.themes.THEME_DEFAULT.copy()
 myimage = pygame_menu.baseimage.BaseImage(
