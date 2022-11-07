@@ -32,8 +32,8 @@ class Player(pygame.sprite.Sprite):
                 self.score += 50
             
 
-    def get_hit(self):
-        self.health -= self.power
+    def get_hit(self, damage: int = 50):
+        self.health -= damage
         if self.health <= 0:
             self.die()
 
@@ -41,7 +41,7 @@ class Player(pygame.sprite.Sprite):
         return self.score
 
     def die(self):
-        self.remove(self.groups())
+        self.kill()
 
     def is_dead(self) -> bool:
         return self.health <= 0
@@ -73,8 +73,8 @@ class SteveJobs(Player):
         self.attacked = False
         self.attack_animation_duration = 0
 
-    def get_hit(self):
-        super().get_hit()
+    def get_hit(self, damage: int = 50):
+        super().get_hit(damage)
         if not self.sound_played:
             pygame.mixer.Sound.play(self.cry)
             self.sound_played = True
@@ -117,6 +117,9 @@ class BillGates(Player):
 
         self.attack_charged = True
 
+        self.hadouken_sound = pygame.mixer.Sound(HADOUKEN_SOUND)
+        self.hadouken_sound.set_volume(0.2)
+
     def set_playable_surface(self, surface: PlayableSurface):
         self.playable_surface = surface
 
@@ -129,27 +132,31 @@ class BillGates(Player):
         keys = pygame.key.get_pressed()
         if keys[pygame.K_z]:
             self.direction.y = -1
-            self.image = self.movements['UP' + ('_ATTACK' if keys[pygame.K_m] else '')]
+            self.image = self.movements['UP' + ('_ATTACK' if keys[pygame.K_m] or keys[pygame.K_l] else '')]
         elif keys[pygame.K_s]:
             self.direction.y = 1
-            self.image = self.movements['DOWN' + ('_ATTACK' if keys[pygame.K_m] else '')]
+            self.image = self.movements['DOWN' + ('_ATTACK' if keys[pygame.K_m] or keys[pygame.K_l] else '')]
         else:
             self.direction.y = 0
-            self.image = self.movements['STATIC' + ('_ATTACK' if keys[pygame.K_m] else '')]
+            self.image = self.movements['STATIC' + ('_ATTACK' if keys[pygame.K_m] or keys[pygame.K_l] else '')]
 
         if keys[pygame.K_q]:
             self.direction.x = -1
-            self.image = self.movements['LEFT' + ('_ATTACK' if keys[pygame.K_m] else '')]
+            self.image = self.movements['LEFT' + ('_ATTACK' if keys[pygame.K_m] or keys[pygame.K_l] else '')]
         elif keys[pygame.K_d]:
             self.direction.x = 1
-            self.image = self.movements['RIGHT' + ('_ATTACK' if keys[pygame.K_m] else '')]
+            self.image = self.movements['RIGHT' + ('_ATTACK' if keys[pygame.K_m] or keys[pygame.K_l] else '')]
         else:
             self.direction.x = 0
 
-        if keys[pygame.K_m] and self.attack_charged:
+        if keys[pygame.K_l] and self.attack_charged:
+            self.Hadouken(self, self.groups())
+            pygame.mixer.Sound.play(self.hadouken_sound)
+            self.attack_charged = False
+        elif keys[pygame.K_m] and self.attack_charged:
             self.attack()
             self.attack_charged = False
-        elif not keys[pygame.K_m]:
+        elif not (keys[pygame.K_m] or keys[pygame.K_l]):
             self.attack_charged = True
 
     def __playable_surface_collisions(self):
@@ -171,3 +178,40 @@ class BillGates(Player):
     def __load_image(self, image: str) -> pygame.surface.Surface:
         surface = pygame.image.load(image).convert_alpha()
         return pygame.transform.scale(surface, (PLAYER_WIDTH, PLAYER_HEIGHT))
+
+    class Hadouken(pygame.sprite.Sprite):
+        def __init__(self, player: Player, *groups: pygame.sprite.AbstractGroup) -> None:
+            super().__init__(*groups)
+
+            self.owner = player
+
+            owner_direction = self.owner.direction.copy()
+            if owner_direction == pygame.math.Vector2(0,0):
+                self.direction = pygame.math.Vector2(0,1)
+            else:
+                self.direction = owner_direction
+            self.speed = HADOUKEN_SPEED
+
+            surface = pygame.image.load(HADOUKEN_IMAGE).convert_alpha()
+            self.image = pygame.transform.scale(surface, (PLAYER_WIDTH, PLAYER_WIDTH))
+            self.rect = self.image.get_rect()
+            self.rect.center = self.owner.rect.center
+
+        def update(self):
+            if self.alive():
+                self.rect.center += self.direction * self.speed
+
+                touched = False
+                hits = pygame.sprite.spritecollide(self, self.owner.ennemies, False)
+                for ennemy in hits:
+                    if not ennemy.alive():
+                        continue
+
+                    distance = sqrt((ennemy.rect.centerx - self.rect.centerx)**2 + (ennemy.rect.bottom - self.owner.rect.bottom)**2)
+                    if distance <= (PLAYER_WIDTH / 3) * 2:
+                        ennemy.get_hit(100)
+                        self.owner.score += 100
+                        touched = True
+
+                if touched:
+                    self.kill()
