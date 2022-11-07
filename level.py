@@ -4,7 +4,7 @@ import random
 
 from typing import Dict, List, Union, Sequence, Any
 
-from player import BillGates, PlayableSurface, Player, SteveJobs
+from player import BillGates, PlayableSurface, Character, SteveJobs
 from settings import *
 
 class Level():
@@ -28,7 +28,7 @@ class Level():
 
         # charging background
         self.background = Background([self.visible_sprites])
-        self.player = BillGates(5, [self.visible_sprites, self.active_sprites])
+        self.player = BillGates([self.visible_sprites, self.active_sprites])
         self.player.rect.bottomleft = self.display_surface.get_rect().bottomleft
         self.player.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
         for _ in range(NB_ENNEMY):
@@ -93,11 +93,11 @@ class CameraGroup(pygame.sprite.Group):
             score_board.rect.topleft = self.camera_rect.topleft
         
         # Display all sprites
-        player_sprites: List[Player] = []
+        player_sprites: List[Character] = []
         for sprite in self.sprites():
             offset_pos = sprite.rect.topleft - self.offset
 
-            if not isinstance(sprite, Player):
+            if not isinstance(sprite, Character):
                 self.display_surface.blit(sprite.image, offset_pos)
             else:
                 player_sprites.append(sprite)
@@ -109,7 +109,7 @@ class CameraGroup(pygame.sprite.Group):
 
 
 class ScoreBoard(pygame.sprite.Sprite):
-    def __init__(self, player: Player, *groups: pygame.sprite.AbstractGroup) -> None:
+    def __init__(self, player: Character, *groups: pygame.sprite.AbstractGroup) -> None:
         super().__init__(*groups)
 
         self.font = pygame.font.SysFont(None, 72)
