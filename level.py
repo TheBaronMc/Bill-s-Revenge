@@ -1,15 +1,19 @@
-from xmlrpc.client import Boolean
 import pygame
 import random
+import enum
 
 from typing import Dict, List, Union, Sequence, Any
 
 from player import BillGates, PlayableSurface, Character, SteveJobs
 from settings import *
 
+class Difficulies(enum.Enum):
+    PEACEFUL = enum.auto()
+    AGGRESSIVE = enum.auto()
+
 class Level():
-    def __init__(self):
-        
+    def __init__(self, nb_ennemies: int, difficulty: Difficulies):
+
         # Level setup
         self.display_surface = pygame.display.get_surface()
         
@@ -22,6 +26,9 @@ class Level():
         self.in_game_song = pygame.mixer.Sound(IN_GAME_SONG)
         self.in_game_song.set_volume(0.2)
 
+        self.nb_ennemies = nb_ennemies
+        self.difficulty = difficulty
+
         self.setup_level()
 
     def setup_level(self):
@@ -31,7 +38,7 @@ class Level():
         self.player = BillGates([self.visible_sprites, self.active_sprites])
         self.player.rect.bottomleft = self.display_surface.get_rect().bottomleft
         self.player.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
-        for _ in range(NB_ENNEMY):
+        for _ in range(self.nb_ennemies):
             x = random.randint(200, PLAYABLE_SURFACE_WIDTH-PLAYER_WIDTH)
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
             self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.active_sprites, self.visible_sprites, self.ennemy_sprites]))
@@ -45,7 +52,7 @@ class Level():
         self.active_sprites.update()
         self.visible_sprites.custom_draw(self.player, self.background, self.score_board)
 
-    def is_finished(self) -> Boolean:
+    def is_finished(self) -> bool:
         return len(self.ennemy_sprites.sprites()) == 0
 
     def scores(self) -> Dict:
@@ -123,5 +130,3 @@ class ScoreBoard(pygame.sprite.Sprite):
 
         self.screen = pygame.display.get_surface()
         self.rect.left = self.screen.get_rect().left
-
-        
