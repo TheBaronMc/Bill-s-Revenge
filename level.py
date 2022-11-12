@@ -37,11 +37,18 @@ class Level():
         self.background = Background([self.visible_sprites])
         self.player = BillGates([self.visible_sprites, self.active_sprites])
         self.player.rect.bottomleft = self.display_surface.get_rect().bottomleft
-        self.player.set_playable_surface(PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT)))
+
+        game_surface = PlayableSurface((PLAYABLE_SURFACE_WIDTH, PLAYABLE_SURFACE_HEIGHT))
+        self.player.set_playable_surface(game_surface)
+
+        ennemy_aggressive = self.difficulty == Difficulies.AGGRESSIVE
         for _ in range(self.nb_ennemies):
             x = random.randint(200, PLAYABLE_SURFACE_WIDTH-PLAYER_WIDTH)
             offset_y = random.randint(0, PLAYABLE_SURFACE_HEIGHT)
-            self.player.add_ennemy(SteveJobs((x, SCREEN_HEIGHT - offset_y), [self.active_sprites, self.visible_sprites, self.ennemy_sprites]))
+            ennemy = SteveJobs(ennemy_aggressive, (x, SCREEN_HEIGHT - offset_y), [self.active_sprites, self.visible_sprites, self.ennemy_sprites])
+            ennemy.add_ennemies(self.player)
+            ennemy.set_playable_surface(game_surface)
+            self.player.add_ennemies(ennemy)
 
         self.score_board = ScoreBoard(self.player, [self.active_sprites, self.visible_sprites])
 
