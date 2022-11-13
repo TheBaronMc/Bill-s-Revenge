@@ -136,6 +136,7 @@ class Ennemy(MoveableCharacter):
 
         if nearest_player == None:
             self.direction.xy = (0,0)
+            self.__discharge_attack()
             return
 
         # Am I close enough?
@@ -144,9 +145,11 @@ class Ennemy(MoveableCharacter):
             if self.attack_charged:
                 self.attack()
                 self.attacking = True
+                self.attack_charged = False
                 self.last_attack = time.time()
             self.direction.xy = (0,0)
         else:
+            self.__discharge_attack()
             # Move to the nearest player
             if abs(self.rect.centerx - nearest_player.rect.centerx) < (SCREEN_WIDTH/2):
                 if nearest_player.rect.centerx < self.rect.centerx:
@@ -171,22 +174,27 @@ class Ennemy(MoveableCharacter):
 
     def __charge_attack(self):
         if self.last_attack:
-            if time.time() - self.last_attack >= 2:
+            if time.time() - self.last_attack >= 4:
                 self.attack_charged = True
-            elif time.time() - self.last_attack >= 1:
+            if time.time() - self.last_attack >= 2:
                 self.attacking = False
         else:
             self.last_attack = time.time()
+    
+    def __discharge_attack(self):
+        self.last_attack = None
+        self.attacking = False
         
-
 
 class SteveJobs(Ennemy):
     def __init__(self, aggressive: bool, starting_position: Tuple[int,int], *groups: pygame.sprite.AbstractGroup) -> None:
-        super().__init__(aggressive, STEVE_JOBS_SPEED, STEVE_JOBS_ATTACK, STEVE_JOBS_HEALTH, STEVE_JOBS, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
+        super().__init__(aggressive, STEVE_JOBS_SPEED, STEVE_JOBS_POWER, STEVE_JOBS_HEALTH, STEVE_JOBS, (PLAYER_WIDTH, PLAYER_HEIGHT), *groups)
 
         self.images: Dict[str,pygame.Surface] = {
             'NORMAL': self.image,
-            'ATTACKED': self.__load_image(STEVE_JOBS_ATTACKED)
+            'NORMAL_ATTACKED': self.__load_image(STEVE_JOBS_ATTACKED),
+            'ATTACK': self.__load_image(STEVE_JOBS_ATTACK),
+            'ATTACK_ATTACKED': self.__load_image(STEVE_JOBS_ATTACK_ATTACKED)
         }
 
         self.rect.bottomleft = starting_position
@@ -204,17 +212,14 @@ class SteveJobs(Ennemy):
             self.sound_played = True
             self.attacked = True
             self.attack_animation_duration = time.time()
-            self.image = self.images['ATTACKED']
+            self.image = self.images[('ATTACK' if self.attacking else 'NORMAL') + ('_ATTACKED' if self.attacked else '')]
             
     def update(self, *args: Any, **kwargs: Any) -> None:
         super().update(*args, **kwargs)
+        self.image = self.images[('ATTACK' if self.attacking else 'NORMAL') + ('_ATTACKED' if self.attacked else '')]
+
         if self.attacked and (time.time() - self.attack_animation_duration > 0.5):
-            self.image = self.images['NORMAL']
             self.attacked = False
-
-    def move(self):
-        super().move()
-
 
     def __load_image(self, image: str) -> pygame.surface.Surface:
         surface = pygame.image.load(image).convert_alpha()
