@@ -264,41 +264,62 @@ class BillGates(PlayableCharacter):
 
         self.movements: Dict[str,pygame.Surface] = {
             'STATIC': self.image,
-            'DOWN': self.image,
-            'UP': self.__load_image(BILL_GATES_BACK),
-            'LEFT': self.__load_image(BILL_GATES_LEFT),
-            'RIGHT': self.__load_image(BILL_GATES_RIGHT),
             'STATIC_ATTACK': self.__load_image(BILL_GATES_FRONT_ATTACK),
+            'STATIC_ATTACKED': self.__load_image(BILL_GATES_FRONT_ATTACKED),
+            'STATIC_ATTACK_ATTACKED': self.__load_image(BILL_GATES_FRONT_ATTACK_ATTACKED),
+            'DOWN': self.image,
+            'DOWN_ATTACKED': self.__load_image(BILL_GATES_FRONT_ATTACKED),
+            'UP': self.__load_image(BILL_GATES_BACK),
+            'UP_ATTACKED': self.__load_image(BILL_GATES_BACK_ATTACKED),
+            'LEFT': self.__load_image(BILL_GATES_LEFT),
+            'LEFT_ATTACKED': self.__load_image(BILL_GATES_LEFT_ATTACKED),
+            'RIGHT': self.__load_image(BILL_GATES_RIGHT),
+            'RIGHT_ATTACKED': self.__load_image(BILL_GATES_RIGHT_ATTACKED),
             'DOWN_ATTACK': self.__load_image(BILL_GATES_FRONT_ATTACK),
+            'DOWN_ATTACK_ATTACKED': self.__load_image(BILL_GATES_FRONT_ATTACK_ATTACKED),
             'UP_ATTACK':  self.__load_image(BILL_GATES_BACK_ATTACK),
+            'UP_ATTACK_ATTACKED':  self.__load_image(BILL_GATES_BACK_ATTACK_ATTACKED),
             'LEFT_ATTACK':  self.__load_image(BILL_GATES_LEFT_ATTACK),
-            'RIGHT_ATTACK':  self.__load_image(BILL_GATES_RIGHT_ATTACK)
+            'LEFT_ATTACK_ATTACKED':  self.__load_image(BILL_GATES_LEFT_ATTACK_ATTACKED),
+            'RIGHT_ATTACK':  self.__load_image(BILL_GATES_RIGHT_ATTACK),
+            'RIGHT_ATTACK_ATTACKED':  self.__load_image(BILL_GATES_RIGHT_ATTACK_ATTACKED)
         }
 
         self.hadouken_sound = pygame.mixer.Sound(HADOUKEN_SOUND)
         self.hadouken_sound.set_volume(0.2)
+
+        self.attacked = False
+        self.attack_animation_duration = 0
 
     def attack_special(self):
         super().attack_special()
         pygame.mixer.Sound.play(self.hadouken_sound)
         self.Hadouken(self, self.groups())
     
+    def get_damage(self, damage: float):
+        super().get_damage(damage)
+        self.attacked = True
+        self.attack_animation_duration = time.time()
+
     def update(self):
         super().update()
 
         if self.direction.y < 0:
-            self.image = self.movements['UP' + ('_ATTACK' if not self.attack_charged else '')]
+            self.image = self.movements['UP' + ('_ATTACK' if not self.attack_charged else '') + ('_ATTACKED' if self.attacked else '')]
         elif self.direction.y > 0:
-            self.image = self.movements['DOWN' + ('_ATTACK' if not self.attack_charged else '')]
+            self.image = self.movements['DOWN' + ('_ATTACK' if not self.attack_charged else '') + ('_ATTACKED' if self.attacked else '')]
         else:
-            self.image = self.movements['STATIC' + ('_ATTACK' if not self.attack_charged else '')]
+            self.image = self.movements['STATIC' + ('_ATTACK' if not self.attack_charged else '') + ('_ATTACKED' if self.attacked else '')]
 
         if self.direction.x < 0:
-            self.image = self.movements['LEFT' + ('_ATTACK' if not self.attack_charged else '')]
+            self.image = self.movements['LEFT' + ('_ATTACK' if not self.attack_charged else '') + ('_ATTACKED' if self.attacked else '')]
         elif self.direction.x > 0:
-            self.image = self.movements['RIGHT' + ('_ATTACK' if not self.attack_charged else '')]
+            self.image = self.movements['RIGHT' + ('_ATTACK' if not self.attack_charged else '') + ('_ATTACKED' if self.attacked else '')]
         else:
             self.direction.x = 0
+
+        if self.attacked and (time.time() - self.attack_animation_duration > 0.5):
+            self.attacked = False
 
     def __load_image(self, image: str) -> pygame.surface.Surface:
         surface = pygame.image.load(image).convert_alpha()
