@@ -29,6 +29,57 @@ def set_difficulty(_, value):
 	global difficulty # TODO: CHANGE IT!!
 	difficulty = value
 
+def end_screen(win: bool):
+	window = pygame.sprite.Sprite()
+	window.rect = pygame.rect.Rect(0,0,SCREEN_WIDTH,SCREEN_HEIGHT)
+	screen = pygame.display.get_surface()
+
+	window.rect.topleft = screen.get_rect().topleft
+	window.image = pygame.surface.Surface((SCREEN_WIDTH,SCREEN_HEIGHT))
+	window.image.fill((0,0,0))
+	window.image.set_alpha(0)
+
+	for i in range(0,100):
+		screen.blit(window.image, window.rect)
+		window.image.set_alpha(i)
+		pygame.display.update()
+	
+
+	window.image.set_alpha(255)
+	screen.blit(window.image, window.rect)
+	pygame.display.update()
+
+	message = pygame.sprite.Sprite()
+	mesage_font = pygame.font.SysFont(None, 72)
+	if win:
+		message.image = mesage_font.render('WIN', True, (255,255,0))
+	else:
+		message.image = mesage_font.render('GAME OVER', True, (255,0,0))
+	message.rect = message.image.get_rect()
+	message.rect.centerx = screen.get_rect().centerx
+	message.rect.bottom = screen.get_rect().centery - message.rect.height
+	screen.blit(message.image, message.rect)
+
+	keymessage = pygame.sprite.Sprite()
+	key_mesage_font = pygame.font.SysFont(None, 32)
+	if win:
+		keymessage.image = key_mesage_font.render('Press any key', True, (255,255,0))
+	else:
+		keymessage.image = key_mesage_font.render('Press any key', True, (255,0,0))
+	keymessage.rect = keymessage.image.get_rect()
+	keymessage.rect.centerx = screen.get_rect().centerx
+	keymessage.rect.bottom = screen.get_rect().centery + message.rect.height*2
+	screen.blit(keymessage.image, keymessage.rect)
+
+	pygame.display.update()
+	
+	level_quit = False
+	while not level_quit:
+		for event in pygame.event.get():
+			if event.type == pygame.KEYDOWN:
+				level_quit = True
+
+
 def run_game(table: pygame_menu.widgets.Table):
 	menu_song.fadeout(100)
 	level = Level(nb_ennemies, difficulty)
@@ -50,6 +101,9 @@ def run_game(table: pygame_menu.widgets.Table):
 	level.quit()
 
 	res = level.scores()
+
+	# end screen
+	end_screen(not res['gameover'])
 
 	date = datetime.datetime.now()
 	date_str = f'{date.day}/{date.month}/{date.year}'
