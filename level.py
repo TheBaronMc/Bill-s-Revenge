@@ -51,13 +51,14 @@ class Level():
             self.player.add_ennemies(ennemy)
 
         self.score_board = ScoreBoard(self.player, [self.active_sprites, self.visible_sprites])
+        self.health_view = HealthView(self.player, [self.active_sprites, self.visible_sprites])
 
         # start music
         pygame.mixer.Sound.play(self.in_game_song)
 
     def run(self):
         self.active_sprites.update()
-        self.visible_sprites.custom_draw(self.player, self.background, self.score_board)
+        self.visible_sprites.custom_draw(self.player, self.background, self.score_board, self.health_view)
 
     def is_finished(self) -> bool:
         return len(self.ennemy_sprites.sprites()) == 0
@@ -88,7 +89,7 @@ class CameraGroup(pygame.sprite.Group):
         # camera
         self.camera_rect = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
-    def custom_draw(self, player: BillGates, background: Background = None, score_board = None):
+    def custom_draw(self, player: BillGates, background: Background = None, score_board = None, health_view = None):
 
         # Camera position
         half_w = SCREEN_WIDTH // 2
@@ -105,6 +106,9 @@ class CameraGroup(pygame.sprite.Group):
         # update score board position
         if score_board:
             score_board.rect.topleft = self.camera_rect.topleft
+        if health_view:
+            health_view.rect.topleft = self.camera_rect.topright
+            health_view.rect.left -= health_view.rect.width
         
         # Display all sprites
         player_sprites: List[Character] = []
@@ -137,3 +141,19 @@ class ScoreBoard(pygame.sprite.Sprite):
 
         self.screen = pygame.display.get_surface()
         self.rect.left = self.screen.get_rect().left
+
+class HealthView(pygame.sprite.Sprite):
+    def __init__(self, player: Character, *groups: pygame.sprite.AbstractGroup) -> None:
+        super().__init__(*groups)
+
+        self.player = player
+        self.font = pygame.font.SysFont(None, 72)
+        self.image = self.font.render('HP: 000', True, (255,0,0))
+        self.rect = self.image.get_rect()
+
+    def update(self, *args: Any, **kwargs: Any) -> None:
+        super().update(*args, **kwargs)
+        self.image = self.font.render('HP: {:0>3}'.format(self.player.health), True, (255,0,0))
+
+        self.screen = pygame.display.get_surface()
+        self.rect.left = self.screen.get_rect().right - self.rect.width
