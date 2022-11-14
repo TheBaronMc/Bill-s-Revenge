@@ -174,9 +174,9 @@ class Ennemy(MoveableCharacter):
 
     def __charge_attack(self):
         if self.last_attack:
-            if time.time() - self.last_attack >= 4:
-                self.attack_charged = True
             if time.time() - self.last_attack >= 2:
+                self.attack_charged = True
+            if time.time() - self.last_attack >= 1:
                 self.attacking = False
         else:
             self.last_attack = time.time()
