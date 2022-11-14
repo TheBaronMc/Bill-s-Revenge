@@ -61,10 +61,15 @@ class Level():
         self.visible_sprites.custom_draw(self.player, self.background, self.score_board, self.health_view)
 
     def is_finished(self) -> bool:
-        return len(self.ennemy_sprites.sprites()) == 0
+        return len(self.ennemy_sprites.sprites()) == 0 or self.player.is_dead()
 
     def scores(self) -> Dict:
-        return { 'score': self.player.get_score() }
+        return { 
+            'score': self.player.get_score(), 
+            'gameover': self.player.is_dead(), 
+            'aggressive': self.difficulty == Difficulies.AGGRESSIVE,
+            'nb_ennemies': self.nb_ennemies
+            }
     
     def quit(self):
         pygame.mixer.Sound.stop(self.in_game_song)

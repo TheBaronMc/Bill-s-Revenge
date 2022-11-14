@@ -22,7 +22,7 @@ class Character(pygame.sprite.Sprite):
             self.kill()
 
     def is_dead(self) -> bool:
-        return self.active()
+        return not self.alive()
 
 
 class PlayableSurface(pygame.sprite.Sprite):

@@ -54,8 +54,8 @@ def run_game(table: pygame_menu.widgets.Table):
 	date = datetime.datetime.now()
 	date_str = f'{date.day}/{date.month}/{date.year}'
 
-	con.add(date_str, str(res['score']), str(round(time.time() - start_time,2)))
-	table.add_row([ date_str, str(res['score']), str(round(time.time() - start_time,2)) ])
+	con.add(date_str, str(res['score']), str(res['nb_ennemies']), str(res['aggressive']), str(res['gameover']), str(round(time.time() - start_time,2)))
+	table.add_row([ date_str, str(res['score']), str(res['nb_ennemies']), str(res['aggressive']), str(res['gameover']), str(round(time.time() - start_time,2)) ])
 	pygame.mixer.Sound.play(menu_song)
 
 mytheme = pygame_menu.themes.THEME_DEFAULT.copy()
@@ -74,7 +74,7 @@ score_menu = pygame_menu.Menu('Scores', SCREEN_WIDTH, SCREEN_HEIGHT,
                        theme=mytheme)
 table = score_menu.add.table(table_id='Score table')
 table.default_cell_padding = 20
-table.add_row(['DATE', 'SCORE', 'TIME'],
+table.add_row(['DATE', 'SCORE', 'NB_ENNEMIES', 'AGGRESSIVE', 'GAMEOVER','TIME'],
               cell_font=pygame_menu.font.FONT_OPEN_SANS_BOLD,
 			  cell_align=pygame_menu.locals.ALIGN_CENTER)
 for score in con.get_stats():
